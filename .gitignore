@@ -1,0 +1,13 @@
+logs/
+# environment
+venv/
+.env
+.vscode/
+.idea/
+
+# test
+
+test/
+
+# doc
+apidoc/
