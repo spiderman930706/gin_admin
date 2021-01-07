@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"gin-admin/api"
 	"github.com/gin-gonic/gin"
+	"github.com/spiderman930706/gin-admin/api"
 )
 
 func InitRouter(Router *gin.RouterGroup) {
