@@ -1,21 +1,18 @@
 package core
 
 import (
-	"gin-admin/config"
 	"log"
 	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"gin_admin/config"
 )
-
-
-
-var db *gorm.DB
 
 func MysqlInit(m config.Mysql) *gorm.DB {
 	var err error
-
+	var db *gorm.DB
 	dbName := m.DbName
 	user := m.User
 	password := m.Password

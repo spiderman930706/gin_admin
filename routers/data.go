@@ -2,10 +2,11 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/spiderman930706/gin-admin/api"
+
+	"gin_admin/api"
 )
 
-func InitRouter(Router *gin.RouterGroup) {
+func InitTableRouter(Router *gin.RouterGroup) {
 	apiRouter := Router.Group("table")
 	{
 		apiRouter.GET("", api.GetAdminTableList)

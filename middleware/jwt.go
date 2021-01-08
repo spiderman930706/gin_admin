@@ -2,23 +2,24 @@ package middleware
 
 import (
 	"errors"
-	service "gin-admin/models"
 	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
-	"github.com/spiderman930706/gin-admin/api"
+
+	"gin_admin"
+	"gin_admin/api"
+	"gin_admin/service"
 )
 
 type CustomClaims struct {
-	UUID        uuid.UUID
-	ID          uint
-	Username    string
-	NickName    string
-	AuthorityId string
-	BufferTime  int64
+	ID         int
+	Username   string
+	Password   string
+	IsAdmin    bool
+	IsStaff    bool
+	BufferTime int64
 	jwt.StandardClaims
 }
 
@@ -44,7 +45,7 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if err, _ = service.FindUserByUuid(claims.UUID.String()); err != nil {
+		if err, _ = service.GetUserId(claims.ID); err != nil {
 			api.FailWithDetailed(gin.H{"reload": true}, err.Error(), c)
 			c.Abort()
 		}
@@ -54,16 +55,6 @@ func JWTAuth() gin.HandlerFunc {
 			newClaims, _ := j.ParseToken(newToken)
 			c.Header("new-token", newToken)
 			c.Header("new-expires-at", strconv.FormatInt(newClaims.ExpiresAt, 10))
-			//if global.GVA_CONFIG.System.UseMultipoint {
-			//	err, RedisJwtToken := service.GetRedisJWT(newClaims.Username)
-			//	if err != nil {
-			//		global.GVA_LOG.Error("get redis jwt failed", zap.Any("err", err))
-			//	} else { // 当之前的取成功时才进行拉黑操作
-			//		_ = service.JsonInBlacklist(model.JwtBlacklist{Jwt: RedisJwtToken})
-			//	}
-			//	// 无论如何都要记录当前的活跃状态
-			//	_ = service.SetRedisJWT(newToken, newClaims.Username)
-			//}
 		}
 		c.Set("claims", claims)
 		c.Next()
@@ -75,15 +66,15 @@ type JWT struct {
 }
 
 var (
-	TokenExpired     = errors.New("Token is expired")
-	TokenNotValidYet = errors.New("Token not active yet")
-	TokenMalformed   = errors.New("That's not even a token")
-	TokenInvalid     = errors.New("Couldn't handle this token:")
+	TokenExpired     = errors.New("token is expired")
+	TokenNotValidYet = errors.New("token not active yet")
+	TokenMalformed   = errors.New("that's not even a token")
+	TokenInvalid     = errors.New("couldn't handle this token")
 )
 
 func NewJWT() *JWT {
 	return &JWT{
-		[]byte(global.GVA_CONFIG.JWT.SigningKey),
+		[]byte(gin_admin.Config.JWT.SigningKey),
 	}
 }
 
