@@ -1,6 +1,9 @@
 package gin_admin
 
 import (
+	"log"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/config"
 	"github.com/spiderman930706/gin_admin/core"
@@ -18,5 +21,14 @@ func Register(config config.Config, Router *gin.RouterGroup) {
 
 func MigrateTables(dst ...interface{}) {
 	core.MigrateMysqlTables(global.DB, dst...)
-	global.DB.Scopes()
+	global.Tables = make(map[string]interface{})
+	for _, n := range dst {
+		model := global.DB.Model(n)
+		if err := model.Statement.Parse(n); err != nil {
+			log.Printf("MySQL启动异常 %s", err)
+			os.Exit(0)
+		}
+		global.Tables[model.Statement.Table] = n //还不清楚n有没有帮助，暂时先用表名和字段名来做数据的增删改
+
+	}
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type CustomClaims struct {
-	ID       int
+	ID       uint
 	Username string
 	IsAdmin  bool
 	IsStaff  bool
