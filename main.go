@@ -28,7 +28,7 @@ func MigrateTables(dst ...interface{}) {
 			log.Printf("MySQL启动异常 %s", err)
 			os.Exit(0)
 		}
-		global.Tables[model.Statement.Table] = n //还不清楚n有没有帮助，暂时先用表名和字段名来做数据的增删改
+		global.Tables[model.Statement.Table] = n //先用表名和字段名来做数据的增删改，但在这里要取出所有定义了admin的参数，比如admin:"list:id;type:int"
 
 	}
 }

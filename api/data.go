@@ -14,6 +14,9 @@ func GetAdminTableList(c *gin.Context) {
 }
 
 func GetAdminTableData(c *gin.Context) {
+	//result := map[string]interface{}{}
+	//global.DB.Table("users").Take(&result)
+
 	table := c.Param("table")
 	fmt.Println(table)
 	c.JSON(http.StatusOK, gin.H{
