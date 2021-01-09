@@ -1,4 +1,4 @@
-module gin_admin
+module github.com/spiderman930706/gin_admin
 
 go 1.14
 

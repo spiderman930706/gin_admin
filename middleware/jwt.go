@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"gin_admin/models"
+	"github.com/spiderman930706/gin_admin/models"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"gin_admin"
-	"gin_admin/api"
+	"github.com/spiderman930706/gin_admin"
+	"github.com/spiderman930706/gin_admin/api"
 )
 
 type CustomClaims struct {

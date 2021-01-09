@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"gin_admin"
-	"gin_admin/models"
+	"github.com/spiderman930706/gin_admin"
+	"github.com/spiderman930706/gin_admin/models"
 )
 
 func GetUserId(id int) (err error, user *models.User) {

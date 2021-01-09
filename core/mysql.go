@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"gin_admin/config"
+	"github.com/spiderman930706/gin_admin/config"
 )
 
 func MysqlInit(m config.Mysql) *gorm.DB {
