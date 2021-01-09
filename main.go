@@ -23,4 +23,5 @@ func Register(config config.Config, Router *gin.RouterGroup) {
 
 func MigrateTables(dst ...interface{}) {
 	core.MigrateMysqlTables(DB, dst...)
+	DB.Scopes()
 }
