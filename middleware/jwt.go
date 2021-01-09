@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"github.com/spiderman930706/gin_admin/models"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"github.com/spiderman930706/gin_admin"
 	"github.com/spiderman930706/gin_admin/api"
+	"github.com/spiderman930706/gin_admin/global"
+	"github.com/spiderman930706/gin_admin/models"
 )
 
 type CustomClaims struct {
@@ -44,9 +44,9 @@ func JWTAuth() gin.HandlerFunc {
 }
 
 func GenerateToken(user models.User) (string, error) {
-	var jwtSecret = []byte(gin_admin.Config.JWT.SigningKey)
+	var jwtSecret = []byte(global.Config.JWT.SigningKey)
 	nowTime := time.Now()
-	expireTime := nowTime.Add(time.Duration(gin_admin.Config.JWT.ExpireSecond) * time.Second)
+	expireTime := nowTime.Add(time.Duration(global.Config.JWT.ExpireSecond) * time.Second)
 
 	claims := CustomClaims{
 		user.ID,
@@ -66,7 +66,7 @@ func GenerateToken(user models.User) (string, error) {
 }
 
 func ParseToken(token string) (*CustomClaims, error) {
-	var jwtSecret = []byte(gin_admin.Config.JWT.SigningKey)
+	var jwtSecret = []byte(global.Config.JWT.SigningKey)
 	tokenClaims, err := jwt.ParseWithClaims(token, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
