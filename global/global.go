@@ -8,5 +8,5 @@ import (
 var (
 	Config config.Config
 	DB     *gorm.DB
-	Tables map[string]interface{}
+	Tables map[string]map[string]map[string]string
 )

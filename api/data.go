@@ -2,15 +2,19 @@ package api
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/spiderman930706/gin_admin/global"
 )
 
 func GetAdminTableList(c *gin.Context) {
-	fmt.Println("GetAdminTableList")
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+	var result []string
+	for k := range global.Tables {
+		result = append(result, k)
+	}
+	OkWithData(result, c)
 }
 
 func GetAdminTableData(c *gin.Context) {
