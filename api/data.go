@@ -2,12 +2,12 @@ package api
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spiderman930706/gin_admin/service"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
+	"github.com/spiderman930706/gin_admin/service"
 )
 
 func GetAdminTableList(c *gin.Context) {
@@ -18,7 +18,7 @@ func GetAdminTableList(c *gin.Context) {
 	OkWithDetailed(result, "获取成功", c)
 }
 
-func GetAdminTableData(c *gin.Context) {
+func GetAdminDataList(c *gin.Context) {
 	pageInfo := models.PageInfo{
 		Table:       c.Param("table"),
 		PageStr:     c.Query("page"),
@@ -28,11 +28,12 @@ func GetAdminTableData(c *gin.Context) {
 		FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, list, total := service.GetTableDataList(pageInfo); err != nil {
+	if err, list, dict, total := service.GetTableDataList(pageInfo); err != nil {
 		FailWithMessage("获取失败", c)
 	} else {
 		OkWithDetailed(models.PageResult{
 			Items:    list,
+			Dict:     dict,
 			Total:    total,
 			Page:     pageInfo.Page,
 			PageSize: pageInfo.PageSize,

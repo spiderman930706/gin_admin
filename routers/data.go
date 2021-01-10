@@ -10,7 +10,7 @@ func InitTableRouter(Router *gin.RouterGroup) {
 	apiRouter := Router.Group("table")
 	{
 		apiRouter.GET("", api.GetAdminTableList)
-		apiRouter.GET("/:table", api.GetAdminTableData)
+		apiRouter.GET("/:table", api.GetAdminDataList)
 		apiRouter.GET("/:table/:data_id", api.GetAdminDataDetail)
 		apiRouter.POST("/:table", api.NewAdminData)
 		apiRouter.PUT("/:table/:data_id", api.ChangeAdminData)
