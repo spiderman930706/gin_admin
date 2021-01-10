@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/spiderman930706/gin_admin/service"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/spiderman930706/gin_admin/global"
+	"github.com/spiderman930706/gin_admin/models"
 )
 
 func GetAdminTableList(c *gin.Context) {
@@ -14,39 +15,32 @@ func GetAdminTableList(c *gin.Context) {
 	for k := range global.Tables {
 		result = append(result, k)
 	}
-	OkWithData(result, c)
+	OkWithDetailed(result, "获取成功", c)
 }
 
 func GetAdminTableData(c *gin.Context) {
-	//result := map[string]interface{}{}
-	//global.DB.Table("users").Take(&result)
-
-	table := c.Param("table")
-	fmt.Println(table)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+	pageInfo := models.PageInfo{
+		Table:       c.Param("table"),
+		PageStr:     c.Query("page"),
+		PageSizeStr: c.Query("size"),
+	}
+	if err := pageInfo.Verify(); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if err, list, total := service.GetTableDataList(pageInfo); err != nil {
+		FailWithMessage("获取失败", c)
+	} else {
+		OkWithDetailed(models.PageResult{
+			Items:    list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
 }
 
-func GetAdminDataDetail(c *gin.Context) {
-	table := c.Param("table")
-	fmt.Println(table)
-	dataId := c.Param("data_id")
-	fmt.Println(dataId)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
-}
-
-func NewAdminData(c *gin.Context) {
-	table := c.Param("table")
-	fmt.Println(table)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
-}
-
-func ChangeAdminData(c *gin.Context) {
+func GetAdminDataDetail(c *gin.Context) { // todo
 	table := c.Param("table")
 	fmt.Println(table)
 	dataId := c.Param("data_id")
@@ -56,7 +50,25 @@ func ChangeAdminData(c *gin.Context) {
 	})
 }
 
-func DeleteAdminData(c *gin.Context) {
+func NewAdminData(c *gin.Context) { // todo
+	table := c.Param("table")
+	fmt.Println(table)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+	})
+}
+
+func ChangeAdminData(c *gin.Context) { // todo
+	table := c.Param("table")
+	fmt.Println(table)
+	dataId := c.Param("data_id")
+	fmt.Println(dataId)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+	})
+}
+
+func DeleteAdminData(c *gin.Context) { // todo
 	table := c.Param("table")
 	fmt.Println(table)
 	dataId := c.Param("data_id")
