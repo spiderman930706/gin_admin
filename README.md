@@ -10,13 +10,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin"
 	"github.com/spiderman930706/gin_admin/config"
 	"github.com/spiderman930706/gin_admin/models"
-	"go-gin-example/pkg/setting"
 )
 
 type User struct {
@@ -27,10 +28,10 @@ type User struct {
 func main() {
 	con := config.Config{
 		Mysql: config.Mysql{
-			DbName:   "",
-			User:     "",
-			Password: "",
-			Host:     "",
+			DbName:   "blog2",
+			User:     "root",
+			Password: "930706",
+			Host:     "127.0.0.1",
 		},
 		JWT: config.JWT{
 			SigningKey:   "example-key",
@@ -41,19 +42,23 @@ func main() {
 
 	//注册gin_admin
 	group := r.Group("admin")
-	gin_admin.RegisterConfigAndRouter(con, group)
-	gin_admin.RegisterTables(
-		true,   //是否表迁移
-		&User{},
-	)
+	if err := gin_admin.RegisterConfigAndRouter(con, group); err != nil {
+		log.Println(err)
+		os.Exit(0)
+	}
+	if err := gin_admin.RegisterTables(true, &User{}); err != nil {
+		log.Println(err)
+		os.Exit(0)
+	}
 
 	s := &http.Server{
-		Addr:           fmt.Sprintf(":%d", setting.HTTPPort),
+		Addr:           fmt.Sprintf(":%d", 8888),
 		Handler:        r,
-		ReadTimeout:    setting.ReadTimeout,
-		WriteTimeout:   setting.WriteTimeout,
+		ReadTimeout:    60,
+		WriteTimeout:   60,
 		MaxHeaderBytes: 1 << 20,
 	}
 	s.ListenAndServe() //.Error()
 }
+
 ```

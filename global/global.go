@@ -13,8 +13,8 @@ type Table struct {
 }
 
 type Field struct {
-	List   string
-	Type   string //目前只想到password这种用途
+	List   string //列表展示页名称，同时用来判断是否在列表页展示该字段
+	Type   string //字段类型，目前只想到password这种用途，其余使用gorm中的类型
 	Schema *schema.Field
 }
 

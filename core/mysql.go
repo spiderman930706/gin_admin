@@ -1,18 +1,14 @@
 package core
 
 import (
-	"log"
-	"os"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 
 	"github.com/spiderman930706/gin_admin/config"
 )
 
-func MysqlInit(m config.Mysql) *gorm.DB {
-	var err error
-	var db *gorm.DB
+func MysqlInit(m config.Mysql) (db *gorm.DB, err error) {
 	dbName := m.DbName
 	user := m.User
 	password := m.Password
@@ -28,21 +24,21 @@ func MysqlInit(m config.Mysql) *gorm.DB {
 	}
 	if db, err = gorm.Open(mysql.New(mysqlConfig), &gorm.Config{}); err != nil {
 		log.Printf("MySQL启动异常 %s", err)
-		os.Exit(0)
+		return nil, err
 	} else {
 		sqlDB, _ := db.DB()
 		sqlDB.SetMaxIdleConns(10)
 		sqlDB.SetMaxOpenConns(100)
 	}
-	return db
+	return db, nil
 }
 
 //数据表迁移
-func MigrateMysqlTables(db *gorm.DB, dst ...interface{}) {
+func MigrateMysqlTables(db *gorm.DB, dst ...interface{}) error {
 	err := db.AutoMigrate(dst...)
 	if err != nil {
-		log.Println(err)
-		os.Exit(0)
+		return err
 	}
 	log.Println("migrate table success")
+	return nil
 }

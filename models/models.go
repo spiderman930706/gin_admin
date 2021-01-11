@@ -13,10 +13,12 @@ type Model struct {
 	ModifiedOn time.Time `json:"modified_time" admin:"list:modified_time;type:time"`
 }
 
+//能否删除字段
 func (m Model) CanDelete() bool {
 	return true
 }
 
+//能否修改字段
 func (m Model) CanModify() bool {
 	return true
 }
