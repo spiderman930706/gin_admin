@@ -87,6 +87,7 @@ func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResul
 	return err, pageResult
 }
 
+//获取所有字段字典
 func DataMap(table string) (dict map[string]map[string]interface{}) {
 	tableInfo := global.Tables[table]
 	dict = make(map[string]map[string]interface{})
@@ -108,4 +109,19 @@ func DataMap(table string) (dict map[string]map[string]interface{}) {
 		dict[k] = dataDict
 	}
 	return
+}
+
+//新增数据
+func CreateData(info models.DataInfo) (err error) {
+	return err
+}
+
+//修改数据
+func ChangeData(info models.DataInfo) (err error) {
+	return err
+}
+
+//删除数据
+func DeleteData(info models.DataInfo) (err error) {
+	return err
 }

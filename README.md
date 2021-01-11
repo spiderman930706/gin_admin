@@ -58,7 +58,7 @@ func main() {
 		WriteTimeout:   60,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe() //.Error()
+	log.Println(s.ListenAndServe().Error())
 }
 
 ```

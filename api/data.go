@@ -1,9 +1,6 @@
 package api
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
@@ -40,7 +37,7 @@ func GetAdminDataDetail(c *gin.Context) {
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
 	}
-	if err := dataInfo.Verify(); err != nil {
+	if err := dataInfo.Verify(true); err != nil {
 		FailWithMessage(err.Error(), c)
 		return
 	}
@@ -52,29 +49,50 @@ func GetAdminDataDetail(c *gin.Context) {
 }
 
 func NewAdminData(c *gin.Context) { // todo
-	table := c.Param("table")
-	fmt.Println(table)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+	dataInfo := models.DataInfo{
+		Table: c.Param("table"),
+		//Data: c.ShouldBindJSON()
+	}
+	if err := dataInfo.Verify(false); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := service.CreateData(dataInfo); err != nil {
+		FailWithMessage("新增失败", c)
+	} else {
+		OkWithMessage("获取成功", c)
+	}
 }
 
 func ChangeAdminData(c *gin.Context) { // todo
-	table := c.Param("table")
-	fmt.Println(table)
-	dataId := c.Param("data_id")
-	fmt.Println(dataId)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+	dataInfo := models.DataInfo{
+		Table:     c.Param("table"),
+		DataIdStr: c.Param("data_id"),
+		//Data: c.ShouldBindJSON()
+	}
+	if err := dataInfo.Verify(true); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := service.ChangeData(dataInfo); err != nil {
+		FailWithMessage("修改失败", c)
+	} else {
+		OkWithMessage("修改成功", c)
+	}
 }
 
 func DeleteAdminData(c *gin.Context) { // todo
-	table := c.Param("table")
-	fmt.Println(table)
-	dataId := c.Param("data_id")
-	fmt.Println(dataId)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+	dataInfo := models.DataInfo{
+		Table:     c.Param("table"),
+		DataIdStr: c.Param("data_id"),
+	}
+	if err := dataInfo.Verify(true); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := service.DeleteData(dataInfo); err != nil {
+		FailWithMessage("删除失败", c)
+	} else {
+		OkWithMessage("删除成功", c)
+	}
 }

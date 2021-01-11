@@ -6,18 +6,30 @@ import (
 	"strconv"
 )
 
+type TableInfo struct {
+	Table string
+}
+
 type PageInfo struct {
-	Table       string `json:"table"`
-	Page        int    `json:"page"`
-	PageSize    int    `json:"pageSize"`
-	PageStr     string `json:"-"`
-	PageSizeStr string `json:"-"`
+	Table       string
+	Page        int
+	PageSize    int
+	PageStr     string
+	PageSizeStr string
 }
 
 type DataInfo struct {
-	Table     string `json:"table"`
-	DataId    int    `json:"data_id"`
-	DataIdStr string `json:"-"`
+	Table     string
+	DataId    int
+	DataIdStr string
+	Data      map[string]interface{}
+}
+
+func (t TableInfo) Verify() (err error) {
+	if err := tableVerify(t.Table); err != nil {
+		return err
+	}
+	return
 }
 
 func (p *PageInfo) Verify() (err error) {
@@ -47,18 +59,21 @@ func (p *PageInfo) Verify() (err error) {
 	return nil
 }
 
-func (d *DataInfo) Verify() (err error) {
+func (d *DataInfo) Verify(checkId bool) (err error) {
 	if err := tableVerify(d.Table); err != nil {
 		return err
 	}
-	id, err := strconv.Atoi(d.DataIdStr)
-	if err != nil {
-		return errors.New("数据id应为数字")
+	if checkId {
+		id, err := strconv.Atoi(d.DataIdStr)
+		if err != nil {
+			return errors.New("数据id应为数字")
+		}
+		if id <= 0 {
+			return errors.New("数据id过于奇怪")
+		}
+		d.DataId = id
 	}
-	if id <= 0 {
-		return errors.New("数据id过于奇怪")
-	}
-	d.DataId = id
+
 	return nil
 }
 
