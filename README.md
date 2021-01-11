@@ -27,10 +27,10 @@ type User struct {
 func main() {
 	con := config.Config{
 		Mysql: config.Mysql{
-			DbName:   "blog2",
-			User:     "root",
-			Password: "930706",
-			Host:     "127.0.0.1",
+			DbName:   "",
+			User:     "",
+			Password: "",
+			Host:     "",
 		},
 		JWT: config.JWT{
 			SigningKey:   "example-key",
