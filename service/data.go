@@ -13,7 +13,7 @@ func GetTableDataList(info models.PageInfo) (err error, list interface{}, dict m
 	var result []map[string]interface{}
 	err = db.Count(&total).Error
 	selectName, dict := listSelectName(table)
-	err = db.Select(selectName).Limit(limit).Offset(offset).Take(&result).Error
+	err = db.Select(selectName).Limit(limit).Offset(offset).Find(&result).Error
 	list = filterListData(table, result)
 	return err, list, dict, total
 }
