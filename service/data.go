@@ -22,7 +22,8 @@ func GetTableDataList(info models.PageInfo) (err error, list interface{}, dict m
 func listSelectName(table string) (list []string, dict map[string]map[string]interface{}) {
 	tableInfo := global.Tables[table]
 	dict = make(map[string]map[string]interface{})
-	for k, v := range tableInfo {
+	fields := tableInfo.Field
+	for k, v := range fields {
 		if v.List != "" && v.Type != "password" {
 			var typeName interface{}
 			if v.Type == "" {
@@ -43,9 +44,10 @@ func listSelectName(table string) (list []string, dict map[string]map[string]int
 //对列表展示页结果数据进行处理
 func filterListData(table string, result []map[string]interface{}) interface{} {
 	tableInfo := global.Tables[table]
+	fields := tableInfo.Field
 	for _, data := range result {
 		for k := range data {
-			info := tableInfo[k]
+			info := fields[k]
 			switch info.Type {
 			case "password":
 				data[k] = ""

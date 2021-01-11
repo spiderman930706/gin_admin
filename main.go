@@ -1,6 +1,7 @@
 package gin_admin
 
 import (
+	"github.com/spiderman930706/gin_admin/models"
 	"log"
 	"os"
 	"strings"
@@ -20,37 +21,47 @@ func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) {
 	routers.InitRouter(Router)
 }
 
-func RegisterTables(migrate bool, dst ...interface{}) {
+func RegisterTables(migrate bool, dst ...models.AdminOperation) {
 	if migrate {
-		core.MigrateMysqlTables(global.DB, dst...)
-	}
-	global.Tables = make(map[string]map[string]*global.Field)
-	for _, n := range dst {
-		model := global.DB.Model(n)
-		if err := model.Statement.Parse(n); err != nil {
-			log.Printf("MySQL启动异常 %s", err)
-			os.Exit(0)
+		var res []interface{}
+		for _, n := range dst {
+			res = append(res, n)
 		}
-		tableName := model.Statement.Table
-		global.Tables[tableName] = make(map[string]*global.Field)
-		//先用表名和字段名来做数据的增删改，但在这里要取出所有定义了admin的参数，比如admin:"list:id;type:int"
-		schemaField := model.Statement.Schema.FieldsByName
-		ParseTag(schemaField, tableName)
+		core.MigrateMysqlTables(global.DB, res...)
+	}
+	global.Tables = make(map[string]*global.Table)
+	for _, n := range dst {
+		ParseSchema(n)
 	}
 }
 
-func ParseTag(fields map[string]*schema.Field, tableName string) {
-	for _, v := range fields {
-		RecordTag(v, tableName)
+func ParseSchema(n models.AdminOperation) {
+	model := global.DB.Model(n)
+	if err := model.Statement.Parse(n); err != nil {
+		log.Printf("MySQL启动异常 %s", err)
+		os.Exit(0)
+	}
+	tableName := model.Statement.Table
+	//先用表名和字段名来做数据的增删改，但在这里要取出所有定义了admin的参数，比如admin:"list:id;type:int"
+	schemaField := model.Statement.Schema.FieldsByName
+	newFields := make(map[string]*global.Field)
+	for _, v := range schemaField {
+		fieldName, field := RecordTag(v, tableName)
+		newFields[fieldName] = field
+	}
+	global.Tables[tableName] = &global.Table{
+		Field:     newFields,
+		CanDelete: n.CanDelete(),
+		CanModify: n.CanModify(),
 	}
 }
 
-func RecordTag(v *schema.Field, tableName string) {
+func RecordTag(v *schema.Field, tableName string) (fieldName string, m *global.Field) {
 	tag := v.Tag
-	fieldName := v.DBName
+	fieldName = v.DBName
 	admin := tag.Get("admin")
 	arr := strings.Split(admin, ";")
-	m := &global.Field{}
+	m = &global.Field{}
 	m.Schema = v
 	for _, n := range arr {
 		rr := strings.Split(n, ":")
@@ -61,5 +72,5 @@ func RecordTag(v *schema.Field, tableName string) {
 			m.Type = rr[1]
 		}
 	}
-	global.Tables[tableName][fieldName] = m
+	return
 }

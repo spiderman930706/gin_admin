@@ -3,8 +3,8 @@ package models
 import "time"
 
 type AdminOperation interface {
-	CanDelete()
-	CanModify()
+	CanDelete() bool
+	CanModify() bool
 }
 
 type Model struct {
