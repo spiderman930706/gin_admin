@@ -28,27 +28,27 @@ func GetAdminDataList(c *gin.Context) {
 		FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, list, dict, total := service.GetTableDataList(pageInfo); err != nil {
+	if err, pageResult := service.GetTableDataList(pageInfo); err != nil {
 		FailWithMessage("获取失败", c)
 	} else {
-		OkWithDetailed(models.PageResult{
-			Items:    list,
-			Dict:     dict,
-			Total:    total,
-			Page:     pageInfo.Page,
-			PageSize: pageInfo.PageSize,
-		}, "获取成功", c)
+		OkWithDetailed(pageResult, "获取成功", c)
 	}
 }
 
-func GetAdminDataDetail(c *gin.Context) { // todo
-	table := c.Param("table")
-	fmt.Println(table)
-	dataId := c.Param("data_id")
-	fmt.Println(dataId)
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-	})
+func GetAdminDataDetail(c *gin.Context) {
+	dataInfo := models.DataInfo{
+		Table:     c.Param("table"),
+		DataIdStr: c.Param("data_id"),
+	}
+	if err := dataInfo.Verify(); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if err, dataResult := service.GetDataDetail(dataInfo); err != nil {
+		FailWithMessage("获取失败", c)
+	} else {
+		OkWithDetailed(dataResult, "获取成功", c)
+	}
 }
 
 func NewAdminData(c *gin.Context) { // todo

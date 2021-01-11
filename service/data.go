@@ -5,17 +5,29 @@ import (
 	"github.com/spiderman930706/gin_admin/models"
 )
 
-func GetTableDataList(info models.PageInfo) (err error, list interface{}, dict map[string]map[string]interface{}, total int64) {
+//列表展示页数据获取
+func GetTableDataList(info models.PageInfo) (err error, pageResult models.PageResult) {
 	limit := info.PageSize
 	table := info.Table
 	offset := info.PageSize * (info.Page - 1)
 	db := global.DB.Table(table)
 	var result []map[string]interface{}
+	var list interface{}
+	var total int64
 	err = db.Count(&total).Error
 	selectName, dict := listSelectName(table)
 	err = db.Select(selectName).Limit(limit).Offset(offset).Find(&result).Error
 	list = filterListData(table, result)
-	return err, list, dict, total
+	pageResult = models.PageResult{
+		Items:     list,
+		Dict:      dict,
+		Total:     total,
+		Page:      info.Page,
+		PageSize:  info.PageSize,
+		CanModify: global.Tables[table].CanModify,
+		CanDelete: global.Tables[table].CanDelete,
+	}
+	return err, pageResult
 }
 
 //获取数据列表页字段字典和查询字段名
@@ -57,4 +69,43 @@ func filterListData(table string, result []map[string]interface{}) interface{} {
 		}
 	}
 	return result
+}
+
+//根据id获取数据
+func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResult) {
+	table := info.Table
+	var result = make(map[string]interface{})
+	dict := DataMap(table)
+
+	err = global.DB.Table(table).Where("id = ?", info.DataId).Take(&result).Error
+	pageResult = models.DataResult{
+		Item:      result,
+		Dict:      dict,
+		CanModify: global.Tables[table].CanModify,
+		CanDelete: global.Tables[table].CanDelete,
+	}
+	return err, pageResult
+}
+
+func DataMap(table string) (dict map[string]map[string]interface{}) {
+	tableInfo := global.Tables[table]
+	dict = make(map[string]map[string]interface{})
+	fields := tableInfo.Field
+	for k, v := range fields {
+		var typeName interface{}
+		if v.Type == "" {
+			typeName = v.Schema.GORMDataType
+		} else {
+			typeName = v.Type
+		}
+		dataDict := make(map[string]interface{})
+		if v.List != "" {
+			dataDict["name"] = v.List
+		} else {
+			dataDict["name"] = k
+		}
+		dataDict["type"] = typeName
+		dict[k] = dataDict
+	}
+	return
 }
