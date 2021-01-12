@@ -15,8 +15,9 @@ type Table struct {
 }
 
 type Field struct {
-	List   string //列表展示页名称，同时用来判断是否在列表页展示该字段
+	List   bool   //用来判断是否在列表页展示该字段
 	Type   string //字段类型，目前只想到password这种用途，其余使用gorm中的类型
+	Name   string //展示名称
 	Schema *schema.Field
 }
 

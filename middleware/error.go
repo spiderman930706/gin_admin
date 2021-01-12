@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/spiderman930706/gin_admin/api"
 	"log"
 	"net"
-	"net/http"
 	"net/http/httputil"
 	"os"
 	"runtime/debug"
@@ -34,8 +34,8 @@ func Recovery() gin.HandlerFunc {
 					return
 				}
 
-				log.Println("[Recovery from panic]", string(httpRequest), err, debug.Stack())
-				c.AbortWithStatus(http.StatusInternalServerError)
+				log.Println("[Recovery from panic]", string(httpRequest), err, string(debug.Stack()))
+				api.ErrorWithMessage(err.(error).Error(), c)
 			}
 		}()
 		c.Next()

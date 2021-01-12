@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
+	"github.com/spiderman930706/gin_admin/util"
 )
 
 //列表展示页数据获取
@@ -26,27 +27,16 @@ func GetTableDataList(info models.PageInfo) (err error, pageResult models.PageRe
 		PageSize:  info.PageSize,
 		CanModify: global.Tables[table].CanModify,
 		CanDelete: global.Tables[table].CanDelete,
+		CanAdd:    global.Tables[table].CanAdd,
 	}
 	return err, pageResult
 }
 
 //获取数据列表页字段字典和查询字段名
-func listSelectName(table string) (list []string, dict map[string]map[string]interface{}) {
-	tableInfo := global.Tables[table]
-	dict = make(map[string]map[string]interface{})
-	fields := tableInfo.Field
-	for k, v := range fields {
-		if v.List != "" && v.Type != "password" {
-			var typeName interface{}
-			if v.Type == "" {
-				typeName = v.Schema.GORMDataType
-			} else {
-				typeName = v.Type
-			}
-			dataDict := make(map[string]interface{})
-			dataDict["name"] = v.List
-			dataDict["type"] = typeName
-			dict[k] = dataDict
+func listSelectName(table string) (list []string, dict map[string]*models.Dict) {
+	dict = util.DataMap(table)
+	for k, v := range dict {
+		if v.List && v.Type != "password" {
 			list = append(list, k)
 		}
 	}
@@ -75,7 +65,7 @@ func filterListData(table string, result []map[string]interface{}) interface{} {
 func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResult) {
 	table := info.Table
 	var result = make(map[string]interface{})
-	dict := DataMap(table)
+	dict := util.DataMap(table)
 
 	err = global.DB.Table(table).Where("id = ?", info.DataId).Take(&result).Error
 	pageResult = models.DataResult{
@@ -87,41 +77,26 @@ func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResul
 	return err, pageResult
 }
 
-//获取所有字段字典
-func DataMap(table string) (dict map[string]map[string]interface{}) {
-	tableInfo := global.Tables[table]
-	dict = make(map[string]map[string]interface{})
-	fields := tableInfo.Field
-	for k, v := range fields {
-		var typeName interface{}
-		if v.Type == "" {
-			typeName = v.Schema.GORMDataType
-		} else {
-			typeName = v.Type
-		}
-		dataDict := make(map[string]interface{})
-		if v.List != "" {
-			dataDict["name"] = v.List
-		} else {
-			dataDict["name"] = k
-		}
-		dataDict["type"] = typeName
-		dict[k] = dataDict
-	}
-	return
-}
-
 //新增数据
 func CreateData(info models.DataInfo) (err error) {
+	data := info.Data
+	result := global.DB.Table(info.Table).Create(&data)
+	err = result.Error
 	return err
 }
 
 //修改数据
 func ChangeData(info models.DataInfo) (err error) {
+	data := info.Data
+	result := global.DB.Table(info.Table).Where("id = ?", info.DataId).Updates(data)
+	err = result.Error
 	return err
 }
 
 //删除数据
 func DeleteData(info models.DataInfo) (err error) {
+	model := global.Tables[info.Table].Source
+	result := global.DB.Table(info.Table).Where("id = ?", info.DataId).Delete(&model) //一定要传？其实传什么都可以
+	err = result.Error
 	return err
 }

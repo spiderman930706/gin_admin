@@ -6,6 +6,7 @@ import (
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
 	"github.com/spiderman930706/gin_admin/service"
+	"github.com/spiderman930706/gin_admin/util"
 )
 
 func GetAdminTableList(c *gin.Context) {
@@ -50,7 +51,7 @@ func GetAdminDataDetail(c *gin.Context) {
 	}
 }
 
-func NewAdminData(c *gin.Context) { // todo
+func NewAdminData(c *gin.Context) {
 	dataInfo := models.DataInfo{
 		Table: c.Param("table"),
 	}
@@ -58,25 +59,49 @@ func NewAdminData(c *gin.Context) { // todo
 		FailWithMessage(err.Error(), c)
 		return
 	}
-	model := global.Tables[dataInfo.Table].Source
-	if err := c.ShouldBindJSON(&model); err != nil {
-		FailWithMessage("新增失败，请检查数据", c)
+	if !global.Tables[dataInfo.Table].CanAdd {
+		FailWithMessage("禁止新增数据", c)
+		return
 	}
-	fmt.Println(model)
+	data := make(map[string]interface{})
+	if err := c.BindJSON(&data); err != nil {
+		FailWithMessage("请求参数有误", c)
+		return
+	}
+	dataInfo.Data = data
+	if err := util.CheckAndChangeData(&dataInfo, false); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
 	if err := service.CreateData(dataInfo); err != nil {
-		FailWithMessage("新增失败", c)
+		FailWithMessage("新增失败，请检查数据", c)
+		return
 	} else {
-		OkWithMessage("获取成功", c)
+		OkWithMessage("新增成功", c)
+		return
 	}
 }
 
-func ChangeAdminData(c *gin.Context) { // todo
+func ChangeAdminData(c *gin.Context) {
 	dataInfo := models.DataInfo{
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
-		//Data: c.ShouldBindJSON()
 	}
 	if err := dataInfo.Verify(true); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if !global.Tables[dataInfo.Table].CanModify {
+		FailWithMessage("禁止修改数据", c)
+		return
+	}
+	data := make(map[string]interface{})
+	if err := c.BindJSON(&data); err != nil {
+		FailWithMessage("请求参数有误", c)
+		return
+	}
+	dataInfo.Data = data
+	if err := util.CheckAndChangeData(&dataInfo, true); err != nil {
 		FailWithMessage(err.Error(), c)
 		return
 	}
@@ -87,13 +112,17 @@ func ChangeAdminData(c *gin.Context) { // todo
 	}
 }
 
-func DeleteAdminData(c *gin.Context) { // todo
+func DeleteAdminData(c *gin.Context) {
 	dataInfo := models.DataInfo{
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
 	}
 	if err := dataInfo.Verify(true); err != nil {
 		FailWithMessage(err.Error(), c)
+		return
+	}
+	if !global.Tables[dataInfo.Table].CanDelete {
+		FailWithMessage("禁止删除数据", c)
 		return
 	}
 	if err := service.DeleteData(dataInfo); err != nil {

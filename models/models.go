@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type AdminOperation interface {
 	CanDelete() bool
@@ -9,9 +11,9 @@ type AdminOperation interface {
 }
 
 type Model struct {
-	ID         uint      `gorm:"primary_key" json:"id" admin:"list:id;type:int"`
-	CreatedOn  time.Time `json:"create_time" admin:"list:create_time;type:time"`
-	ModifiedOn time.Time `json:"modified_time" admin:"list:modified_time;type:time"`
+	ID         uint      `gorm:"primary_key" json:"id" admin:"list;type:int;name:序号"`
+	CreatedOn  time.Time `json:"created_on" admin:"list;type:time;name:添加时间"`
+	ModifiedOn time.Time `json:"modified_on" admin:"list;type:time:修改时间"`
 }
 
 //能否删除数据

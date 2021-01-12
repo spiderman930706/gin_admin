@@ -8,6 +8,7 @@ type PageResult struct {
 	PageSize  int         `json:"pageSize"`
 	CanModify bool        `json:"can_modify"`
 	CanDelete bool        `json:"can_delete"`
+	CanAdd    bool        `json:"can_add"`
 }
 
 type DataResult struct {
@@ -15,4 +16,10 @@ type DataResult struct {
 	Dict      interface{} `json:"dict"`
 	CanModify bool        `json:"can_modify"`
 	CanDelete bool        `json:"can_delete"`
+}
+
+type Dict struct {
+	Name string `json:"name"`
+	List bool   `json:"list"`
+	Type string `json:"type"`
 }

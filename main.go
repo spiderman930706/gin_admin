@@ -82,9 +82,11 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 		rr := strings.Split(n, ":")
 		switch rr[0] {
 		case "list":
-			m.List = rr[1]
+			m.List = true
 		case "type":
 			m.Type = rr[1]
+		case "name":
+			m.Name = rr[1]
 		}
 	}
 	return

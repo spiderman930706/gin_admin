@@ -2,8 +2,9 @@ package models
 
 import (
 	"errors"
-	"github.com/spiderman930706/gin_admin/global"
 	"strconv"
+
+	"github.com/spiderman930706/gin_admin/global"
 )
 
 type TableInfo struct {
@@ -22,10 +23,10 @@ type DataInfo struct {
 	Table     string
 	DataId    int
 	DataIdStr string
-	Data      interface{}
+	Data      map[string]interface{}
 }
 
-func (t TableInfo) Verify() (err error) {
+func (t *TableInfo) Verify() (err error) {
 	if err := tableVerify(t.Table); err != nil {
 		return err
 	}
@@ -73,7 +74,6 @@ func (d *DataInfo) Verify(checkId bool) (err error) {
 		}
 		d.DataId = id
 	}
-
 	return nil
 }
 
