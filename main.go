@@ -1,7 +1,6 @@
 package gin_admin
 
 import (
-	"github.com/spiderman930706/gin_admin/models"
 	"log"
 	"strings"
 
@@ -9,6 +8,8 @@ import (
 	"github.com/spiderman930706/gin_admin/config"
 	"github.com/spiderman930706/gin_admin/core"
 	"github.com/spiderman930706/gin_admin/global"
+	"github.com/spiderman930706/gin_admin/middleware"
+	"github.com/spiderman930706/gin_admin/models"
 	"github.com/spiderman930706/gin_admin/routers"
 	"gorm.io/gorm/schema"
 )
@@ -21,6 +22,7 @@ func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) erro
 	}
 	global.DB = db
 	//Router.Use(middleware.JWTAuth())
+	Router.Use(middleware.Cors()).Use(middleware.Recovery())
 	routers.InitRouter(Router)
 	return nil
 }
@@ -44,7 +46,7 @@ func RegisterTables(migrate bool, dst ...models.AdminOperation) error {
 	return nil
 }
 
-//获取
+//获取表信息
 func ParseSchema(n models.AdminOperation) error {
 	model := global.DB.Model(n)
 	if err := model.Statement.Parse(n); err != nil {
@@ -56,21 +58,22 @@ func ParseSchema(n models.AdminOperation) error {
 	schemaField := model.Statement.Schema.FieldsByName
 	newFields := make(map[string]*global.Field)
 	for _, v := range schemaField {
-		fieldName, field := ParseTag(v)
-		newFields[fieldName] = field
+		field := ParseTag(v)
+		newFields[v.DBName] = field
 	}
 	global.Tables[tableName] = &global.Table{
 		Field:     newFields,
+		Source:    n,
 		CanDelete: n.CanDelete(),
 		CanModify: n.CanModify(),
+		CanAdd:    n.CanAdd(),
 	}
 	return nil
 }
 
 //获取struct tag中admin的信息
-func ParseTag(v *schema.Field) (fieldName string, m *global.Field) {
+func ParseTag(v *schema.Field) (m *global.Field) {
 	tag := v.Tag
-	fieldName = v.DBName
 	admin := tag.Get("admin")
 	arr := strings.Split(admin, ";")
 	m = &global.Field{}

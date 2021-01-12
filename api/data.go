@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
@@ -13,6 +14,7 @@ func GetAdminTableList(c *gin.Context) {
 		result = append(result, k)
 	}
 	OkWithDetailed(result, "获取成功", c)
+	fmt.Println("end")
 }
 
 func GetAdminDataList(c *gin.Context) {
@@ -51,12 +53,16 @@ func GetAdminDataDetail(c *gin.Context) {
 func NewAdminData(c *gin.Context) { // todo
 	dataInfo := models.DataInfo{
 		Table: c.Param("table"),
-		//Data: c.ShouldBindJSON()
 	}
 	if err := dataInfo.Verify(false); err != nil {
 		FailWithMessage(err.Error(), c)
 		return
 	}
+	model := global.Tables[dataInfo.Table].Source
+	if err := c.ShouldBindJSON(&model); err != nil {
+		FailWithMessage("新增失败，请检查数据", c)
+	}
+	fmt.Println(model)
 	if err := service.CreateData(dataInfo); err != nil {
 		FailWithMessage("新增失败", c)
 	} else {

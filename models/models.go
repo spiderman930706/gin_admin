@@ -5,6 +5,7 @@ import "time"
 type AdminOperation interface {
 	CanDelete() bool
 	CanModify() bool
+	CanAdd() bool
 }
 
 type Model struct {
@@ -13,12 +14,17 @@ type Model struct {
 	ModifiedOn time.Time `json:"modified_time" admin:"list:modified_time;type:time"`
 }
 
-//能否删除字段
+//能否删除数据
 func (m Model) CanDelete() bool {
 	return true
 }
 
-//能否修改字段
+//能否修改数据
 func (m Model) CanModify() bool {
+	return true
+}
+
+//能否新增数据
+func (m Model) CanAdd() bool {
 	return true
 }

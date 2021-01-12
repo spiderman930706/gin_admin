@@ -8,8 +8,10 @@ import (
 
 type Table struct {
 	Field     map[string]*Field
+	Source    interface{}
 	CanModify bool
 	CanDelete bool
+	CanAdd    bool
 }
 
 type Field struct {

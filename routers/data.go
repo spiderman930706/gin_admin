@@ -7,13 +7,13 @@ import (
 )
 
 func InitTableRouter(Router *gin.RouterGroup) {
-	apiRouter := Router.Group("table")
+	apiRouter := Router.Group("tables")
 	{
-		apiRouter.GET("", api.GetAdminTableList)
-		apiRouter.GET("/:table", api.GetAdminDataList)
-		apiRouter.GET("/:table/:data_id", api.GetAdminDataDetail)
-		apiRouter.POST("/:table", api.NewAdminData)
-		apiRouter.PUT("/:table/:data_id", api.ChangeAdminData)
-		apiRouter.DELETE("/:table/:data_id", api.DeleteAdminData)
+		apiRouter.GET("/list", api.GetAdminTableList)
+		apiRouter.GET("/dataList/:table", api.GetAdminDataList)
+		apiRouter.GET("/dataDetail/:table/:data_id", api.GetAdminDataDetail)
+		apiRouter.POST("/newData/:table", api.NewAdminData)
+		apiRouter.PUT("/changeData/:table/:data_id", api.ChangeAdminData)
+		apiRouter.DELETE("/deleteData/:table/:data_id", api.DeleteAdminData)
 	}
 }

@@ -13,10 +13,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+    "time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin"
 	"github.com/spiderman930706/gin_admin/config"
+    "github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
 )
 
@@ -38,7 +40,7 @@ func main() {
 			ExpireSecond: 7 * 24 * 3600,
 		},
 	}
-	r := gin.New()
+	r := gin.Default()
 
 	//注册gin_admin
 	group := r.Group("admin")
@@ -54,9 +56,9 @@ func main() {
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", 8888),
 		Handler:        r,
-		ReadTimeout:    60,
-		WriteTimeout:   60,
-		MaxHeaderBytes: 1 << 20,
+        ReadTimeout:    10 * time.Second,
+        WriteTimeout:   10 * time.Second,
+        MaxHeaderBytes: 1 << 20,
 	}
 	log.Println(s.ListenAndServe().Error())
 }

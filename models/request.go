@@ -22,7 +22,7 @@ type DataInfo struct {
 	Table     string
 	DataId    int
 	DataIdStr string
-	Data      map[string]interface{}
+	Data      interface{}
 }
 
 func (t TableInfo) Verify() (err error) {
