@@ -24,7 +24,7 @@ import (
 
 type User struct {
     models.User
-    Phone string `gorm:"column:phone_num;type:varchar(15);unique_index" json:"phone"`
+    Phone string `gorm:"column:phone_num;type:varchar(15);unique_index" json:"phone" admin:"name:手机"`
 }
 
 func main() {
