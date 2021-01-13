@@ -1,6 +1,7 @@
 package gin_admin
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -60,6 +61,9 @@ func ParseSchema(n models.AdminOperation) error {
 	schemaField := model.Statement.Schema.FieldsByName
 	newFields := make(map[string]*global.Field)
 	for _, v := range schemaField {
+		if v.DBName == "" {
+			continue
+		}
 		field := ParseTag(v)
 		newFields[v.DBName] = field
 	}
@@ -90,6 +94,9 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 		case "name":
 			m.Name = rr[1]
 		}
+	}
+	if v.DBName == "" {
+		fmt.Println("")
 	}
 	return
 }
