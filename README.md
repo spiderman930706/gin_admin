@@ -9,58 +9,58 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-	"os"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
     "time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/spiderman930706/gin_admin"
-	"github.com/spiderman930706/gin_admin/config"
+    "github.com/gin-gonic/gin"
+    "github.com/spiderman930706/gin_admin"
+    "github.com/spiderman930706/gin_admin/config"
     "github.com/spiderman930706/gin_admin/global"
-	"github.com/spiderman930706/gin_admin/models"
+    "github.com/spiderman930706/gin_admin/models"
 )
 
 type User struct {
-	models.User
-	Phone string `gorm:"column:phone_num;type:varchar(15);unique_index" json:"phone"`
+    models.User
+    Phone string `gorm:"column:phone_num;type:varchar(15);unique_index" json:"phone"`
 }
 
 func main() {
-	con := config.Config{
-		Mysql: config.Mysql{
-			DbName:   "",       //mysql配置信息
-			User:     "root",
-			Password: "",
-			Host:     "127.0.0.1",
-		},
-		JWT: config.JWT{
-			SigningKey:   "example-key",    //jwt配置信息
-			ExpireSecond: 7 * 24 * 3600,
-		},
-	}
-	r := gin.Default()
-
-	//注册gin_admin
-	group := r.Group("admin")
-	if err := gin_admin.RegisterConfigAndRouter(con, group); err != nil {
-		log.Println(err)
-		os.Exit(0)
-	}
-	if err := gin_admin.RegisterTables(true, &User{}); err != nil {
-		log.Println(err)
-		os.Exit(0)
-	}
-
-	s := &http.Server{
-		Addr:           fmt.Sprintf(":%d", 8888),
-		Handler:        r,
+    con := config.Config{
+        Mysql: config.Mysql{
+            DbName:   "",       //mysql配置信息
+            User:     "root",
+            Password: "",
+            Host:     "127.0.0.1",
+        },
+        JWT: config.JWT{
+            SigningKey:   "example-key",    //jwt配置信息
+            ExpireSecond: 7 * 24 * 3600,
+        },
+    }
+    r := gin.Default()
+    
+    //注册gin_admin
+    group := r.Group("admin")
+    if err := gin_admin.RegisterConfigAndRouter(con, group); err != nil {
+        log.Println(err)
+        os.Exit(0)
+    }
+    if err := gin_admin.RegisterTables(true, &User{}); err != nil {
+        log.Println(err)
+        os.Exit(0)
+    }
+    
+    s := &http.Server{
+        Addr:           fmt.Sprintf(":%d", 8888),
+        Handler:        r,
         ReadTimeout:    10 * time.Second,
         WriteTimeout:   10 * time.Second,
         MaxHeaderBytes: 1 << 20,
-	}
-	log.Println(s.ListenAndServe().Error())
+    }
+    log.Println(s.ListenAndServe().Error())
 }
 
 ```
