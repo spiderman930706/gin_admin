@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/global"
 	"github.com/spiderman930706/gin_admin/models"
@@ -15,7 +14,6 @@ func GetAdminTableList(c *gin.Context) {
 		result = append(result, k)
 	}
 	OkWithDetailed(result, "获取成功", c)
-	fmt.Println("end")
 }
 
 func GetAdminDataList(c *gin.Context) {

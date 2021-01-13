@@ -33,10 +33,12 @@ func RegisterTables(migrate bool, dst ...models.AdminOperation) error {
 		for _, n := range dst {
 			res = append(res, n)
 		}
+		res = append(res, &models.Role{})
 		if err := core.MigrateMysqlTables(global.DB, res...); err != nil {
 			return err
 		}
 	}
+	dst = append(dst, &models.Role{})
 	global.Tables = make(map[string]*global.Table)
 	for _, n := range dst {
 		if err := ParseSchema(n); err != nil {
