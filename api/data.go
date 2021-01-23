@@ -131,3 +131,31 @@ func DeleteAdminData(c *gin.Context) {
 		OkWithMessage("删除成功", c)
 	}
 }
+
+func BatchDeleteAdminData(c *gin.Context) {
+	dataInfo := models.DataInfo{
+		Table: c.Param("table"),
+	}
+	var idList models.BatchID
+	if err := c.ShouldBindJSON(&idList); err != nil {
+		FailWithMessage("请求参数有误", c)
+		return
+	}
+	if len(idList.IDList) == 0 {
+		FailWithMessage("需要携带id_list", c)
+		return
+	}
+	if err := dataInfo.Verify(false); err != nil {
+		FailWithMessage(err.Error(), c)
+		return
+	}
+	if !global.Tables[dataInfo.Table].CanDelete {
+		FailWithMessage("禁止删除数据", c)
+		return
+	}
+	if err := service.BatchDeleteData(dataInfo, idList); err != nil {
+		FailWithMessage("删除失败", c)
+	} else {
+		OkWithMessage("删除成功", c)
+	}
+}

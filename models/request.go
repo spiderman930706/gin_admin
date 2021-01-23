@@ -26,6 +26,10 @@ type DataInfo struct {
 	Data      map[string]interface{}
 }
 
+type BatchID struct {
+	IDList []int `json:"id_list"`
+}
+
 func (t *TableInfo) Verify() (err error) {
 	if err := tableVerify(t.Table); err != nil {
 		return err

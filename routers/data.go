@@ -15,5 +15,6 @@ func InitTableRouter(Router *gin.RouterGroup) {
 		apiRouter.POST("/:table", api.NewAdminData)
 		apiRouter.PUT("/:table/:data_id", api.ChangeAdminData)
 		apiRouter.DELETE("/:table/:data_id", api.DeleteAdminData)
+		apiRouter.DELETE("/:table", api.BatchDeleteAdminData)
 	}
 }
