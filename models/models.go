@@ -12,8 +12,8 @@ type AdminOperation interface {
 
 type Model struct {
 	ID         uint      `gorm:"primary_key" json:"id" admin:"list;type:int;name:序号"`
-	CreatedOn  time.Time `json:"created_on" admin:"list;type:time;name:添加时间"`
-	ModifiedOn time.Time `json:"modified_on" admin:"list;type:time:修改时间"`
+	CreatedOn  time.Time `json:"created_on" admin:"list;type:time;name:添加时间" gorm:"not null"`
+	ModifiedOn time.Time `json:"modified_on" admin:"list;type:time:修改时间" gorm:"not null"`
 }
 
 //能否删除数据
