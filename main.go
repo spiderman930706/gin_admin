@@ -1,6 +1,7 @@
 package gin_admin
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -33,10 +34,12 @@ func RegisterTables(migrate bool, dst ...models.AdminOperation) error {
 		for _, n := range dst {
 			res = append(res, n)
 		}
+		res = append(res, &models.Role{})
 		if err := core.MigrateMysqlTables(global.DB, res...); err != nil {
 			return err
 		}
 	}
+	dst = append(dst, &models.Role{})
 	global.Tables = make(map[string]*global.Table)
 	for _, n := range dst {
 		if err := ParseSchema(n); err != nil {
@@ -58,6 +61,9 @@ func ParseSchema(n models.AdminOperation) error {
 	schemaField := model.Statement.Schema.FieldsByName
 	newFields := make(map[string]*global.Field)
 	for _, v := range schemaField {
+		if v.DBName == "" {
+			continue
+		}
 		field := ParseTag(v)
 		newFields[v.DBName] = field
 	}
@@ -88,6 +94,9 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 		case "name":
 			m.Name = rr[1]
 		}
+	}
+	if v.DBName == "" {
+		fmt.Println("")
 	}
 	return
 }

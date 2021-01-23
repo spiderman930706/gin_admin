@@ -21,7 +21,7 @@ type CustomClaims struct {
 
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 我们这里jwt鉴权取头部信息 x-token，postman使用api key认证
+		// jwt鉴权取头部信息 x-token，postman使用api key认证
 		token := c.Request.Header.Get("x-token")
 		if token == "" {
 			api.FailWithDetailed(gin.H{"reload": true}, "未登录或非法访问", c)

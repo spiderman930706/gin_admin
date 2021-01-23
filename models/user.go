@@ -6,4 +6,18 @@ type User struct {
 	Password string `json:"password" admin:"type:password;name:密码"`
 	IsAdmin  bool   `json:"is_admin" admin:"list;name:超级管理员"`
 	IsStaff  bool   `json:"is_staff" admin:"list;name:职员"`
+	Role     Role
+	RoleID   int `json:"role_id" gorm:"index" admin:"name:角色"`
+}
+
+type Role struct {
+	Model
+	Name string `admin:"name:角色名称;list"`
+	Auth []Auth `gorm:"many2many:role_auths;"`
+}
+
+type Auth struct {
+	Model
+	Table  string `json:"table"`
+	Method string `json:"method"`
 }
