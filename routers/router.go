@@ -4,8 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouter(Router *gin.RouterGroup) {
-	InitTableRouter(Router)
-	//InitUserRouter(Router)
-
+func InitRouter(AuthGroup *gin.RouterGroup, PubGroup *gin.RouterGroup) {
+	InitTableRouter(AuthGroup)
+	InitPubUserRouter(PubGroup)
 }

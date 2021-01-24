@@ -23,3 +23,7 @@ type Dict struct {
 	List bool   `json:"list"`
 	Type string `json:"type"`
 }
+
+type LoginResult struct {
+	Token string `json:"token"`
+}

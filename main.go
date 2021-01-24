@@ -22,9 +22,11 @@ func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) erro
 		return err
 	}
 	global.DB = db
-	//Router.Use(middleware.JWTAuth())
 	Router.Use(middleware.Cors()).Use(middleware.Recovery())
-	routers.InitRouter(Router)
+	AuthGroup := Router.Group("")
+	AuthGroup.Use(middleware.JWTAuth()).Use(middleware.AdminAuth())
+	PubGroup := Router.Group("")
+	routers.InitRouter(AuthGroup, PubGroup)
 	return nil
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 //列表展示页数据获取
-func GetTableDataList(info models.PageInfo) (err error, pageResult models.PageResult) {
+func GetTableDataList(info *models.PageInfo) (err error, pageResult *models.PageResult) {
 	limit := info.PageSize
 	table := info.Table
 	offset := info.PageSize * (info.Page - 1)
@@ -19,7 +19,7 @@ func GetTableDataList(info models.PageInfo) (err error, pageResult models.PageRe
 	selectName, dict := listSelectName(table)
 	err = db.Select(selectName).Limit(limit).Offset(offset).Find(&result).Error
 	list = filterListData(table, result)
-	pageResult = models.PageResult{
+	pageResult = &models.PageResult{
 		Items:     list,
 		Dict:      dict,
 		Total:     total,
@@ -52,7 +52,7 @@ func filterListData(table string, result []map[string]interface{}) interface{} {
 			info := fields[k]
 			switch info.Type {
 			case "password":
-				data[k] = ""
+				data[k] = "******"
 			case "time":
 				//todo 处理时间转换
 			}
@@ -62,13 +62,13 @@ func filterListData(table string, result []map[string]interface{}) interface{} {
 }
 
 //根据id获取数据
-func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResult) {
+func GetDataDetail(info *models.DataInfo) (err error, pageResult *models.DataResult) {
 	table := info.Table
 	var result = make(map[string]interface{})
 	dict := util.DataMap(table)
 
 	err = global.DB.Table(table).Where("id = ?", info.DataId).Take(&result).Error
-	pageResult = models.DataResult{
+	pageResult = &models.DataResult{
 		Item:      result,
 		Dict:      dict,
 		CanModify: global.Tables[table].CanModify,
@@ -78,7 +78,7 @@ func GetDataDetail(info models.DataInfo) (err error, pageResult models.DataResul
 }
 
 //新增数据
-func CreateData(info models.DataInfo) (err error) {
+func CreateData(info *models.DataInfo) (err error) {
 	data := info.Data
 	result := global.DB.Table(info.Table).Create(&data)
 	err = result.Error
@@ -86,7 +86,7 @@ func CreateData(info models.DataInfo) (err error) {
 }
 
 //修改数据
-func ChangeData(info models.DataInfo) (err error) {
+func ChangeData(info *models.DataInfo) (err error) {
 	data := info.Data
 	result := global.DB.Table(info.Table).Where("id = ?", info.DataId).Updates(data)
 	err = result.Error
@@ -94,14 +94,14 @@ func ChangeData(info models.DataInfo) (err error) {
 }
 
 //删除数据
-func DeleteData(info models.DataInfo) (err error) {
+func DeleteData(info *models.DataInfo) (err error) {
 	model := global.Tables[info.Table].Source
 	result := global.DB.Table(info.Table).Where("id = ?", info.DataId).Delete(&model) //一定要传？其实传什么都可以
 	err = result.Error
 	return err
 }
 
-func BatchDeleteData(info models.DataInfo, batchID models.BatchID) (err error) {
+func BatchDeleteData(info *models.DataInfo, batchID *models.BatchID) (err error) {
 	model := global.Tables[info.Table].Source
 	result := global.DB.Table(info.Table).Where("id in ?", batchID.IDList).Delete(&model)
 	err = result.Error

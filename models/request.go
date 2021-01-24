@@ -30,6 +30,11 @@ type BatchID struct {
 	IDList []int `json:"id_list"`
 }
 
+type Login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (t *TableInfo) Verify() (err error) {
 	if err := tableVerify(t.Table); err != nil {
 		return err
@@ -89,4 +94,11 @@ func tableVerify(table string) error {
 		return errors.New("表不存在")
 	}
 	return nil
+}
+
+func (l *Login) Verify() (err error) {
+	if l.Password == "" || l.Username == "" {
+		return errors.New("缺少请求参数")
+	}
+	return
 }

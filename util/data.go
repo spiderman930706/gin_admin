@@ -58,10 +58,10 @@ func CheckFields(info *models.DataInfo) error {
 			dataType := table.Type
 			switch dataType {
 			case "password":
-				//todo 密码加密
-				fmt.Println("密码")
 				if value, ok := v.(string); ok {
-					fmt.Println(value)
+					info.Data[k] = MD5V([]byte(value))
+				} else {
+					return errors.New("密码居然不是字符串？")
 				}
 			case "time":
 				//todo 时间类型转换
