@@ -100,3 +100,10 @@ func DeleteData(info models.DataInfo) (err error) {
 	err = result.Error
 	return err
 }
+
+func BatchDeleteData(info models.DataInfo, batchID models.BatchID) (err error) {
+	model := global.Tables[info.Table].Source
+	result := global.DB.Table(info.Table).Where("id in ?", batchID.IDList).Delete(&model)
+	err = result.Error
+	return err
+}
