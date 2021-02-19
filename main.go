@@ -26,7 +26,7 @@ func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) erro
 	AuthGroup.Use(middleware.JWTAuth()).Use(middleware.RoleAuth())
 	PubGroup := Router.Group("")
 	AdminGroup := Router.Group("")
-	AdminGroup.Use(middleware.AdminAuth())
+	AdminGroup.Use(middleware.JWTAuth()).Use(middleware.AdminAuth())
 	routers.InitRouter(AuthGroup, PubGroup, AdminGroup)
 	return nil
 }
@@ -109,7 +109,6 @@ func syncAuthTable() {
 	for tableName := range global.Tables {
 		var auths []models.Auth
 		var method global.Method
-		fmt.Println(tableName)
 		global.DB.Where("table_name = ?", tableName).Find(&auths)
 		for _, auth := range auths {
 			authMethod := auth.Method

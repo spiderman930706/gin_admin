@@ -11,10 +11,3 @@ func InitPubUserRouter(Router *gin.RouterGroup) {
 		apiRouter.POST("login", api.UserLogin)
 	}
 }
-
-//func InitAuthUserRouter(Router *gin.RouterGroup) {
-//	apiRouter := Router.Group("auth_user")
-//	{
-//		apiRouter.POST("login", api.UserLogin)
-//	}
-//}
