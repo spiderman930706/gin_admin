@@ -26,7 +26,7 @@ func DataMap(table string) (dict map[string]*models.Dict) {
 		} else {
 			dataDict.Name = k
 		}
-		dataDict.List = v.List
+		dataDict.ListShow = v.ListShow
 		dataDict.Type = typeName
 		dict[k] = dataDict
 	}
@@ -43,9 +43,9 @@ func CheckAndChangeData(info *models.DataInfo, modify bool) (err error) {
 
 func UpdateTime(modify bool, data map[string]interface{}) {
 	if !modify {
-		data["created_on"] = time.Now()
+		data["created_at"] = time.Now()
 	}
-	data["modified_on"] = time.Now()
+	data["updated_at"] = time.Now()
 }
 
 func CheckFields(info *models.DataInfo) error {

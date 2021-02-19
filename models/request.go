@@ -36,14 +36,14 @@ type Login struct {
 }
 
 func (t *TableInfo) Verify() (err error) {
-	if err := tableVerify(t.Table); err != nil {
+	if err := TableVerify(t.Table); err != nil {
 		return err
 	}
 	return
 }
 
 func (p *PageInfo) Verify() (err error) {
-	if err := tableVerify(p.Table); err != nil {
+	if err := TableVerify(p.Table); err != nil {
 		return err
 	}
 	page, err := strconv.Atoi(p.PageStr)
@@ -70,7 +70,7 @@ func (p *PageInfo) Verify() (err error) {
 }
 
 func (d *DataInfo) Verify(checkId bool) (err error) {
-	if err := tableVerify(d.Table); err != nil {
+	if err := TableVerify(d.Table); err != nil {
 		return err
 	}
 	if checkId {
@@ -86,7 +86,7 @@ func (d *DataInfo) Verify(checkId bool) (err error) {
 	return nil
 }
 
-func tableVerify(table string) error {
+func TableVerify(table string) error {
 	if table == "" {
 		return errors.New("表名不能为空")
 	}

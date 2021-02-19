@@ -15,14 +15,22 @@ type Table struct {
 }
 
 type Field struct {
-	List   bool   //用来判断是否在列表页展示该字段
-	Type   string //字段类型，目前只想到password这种用途，其余使用gorm中的类型
-	Name   string //展示名称
-	Schema *schema.Field
+	ListShow bool   //用来判断是否在列表页展示该字段
+	Type     string //字段类型，目前只想到password这种用途，其余使用gorm中的类型
+	Name     string //展示名称
+	Schema   *schema.Field
+}
+
+type Method struct {
+	GET    bool
+	POST   bool
+	PUT    bool
+	DELETE bool
 }
 
 var (
 	Config config.Config
 	DB     *gorm.DB
 	Tables map[string]*Table
+	//AuthMap map[int]map[string]*Method
 )

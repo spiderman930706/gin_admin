@@ -13,11 +13,11 @@ type User struct {
 type Role struct {
 	Model
 	Name string `gorm:"unique;not null" admin:"name:角色名称;list"`
-	Auth []Auth `gorm:"many2many:role_auths;"`
+	Auth []Auth `gorm:"many2many:role_auths;constraint:OnDelete:CASCADE;"`
 }
 
 type Auth struct {
 	Model
-	Table  string `json:"table" gorm:"uniqueIndex:table_method;not null"`
-	Method string `json:"method" gorm:"uniqueIndex:table_method;not null"`
+	TableName string `json:"table_name" gorm:"uniqueIndex:table_name_method;not null"`
+	Method    string `json:"method" gorm:"uniqueIndex:table_name_method;not null"`
 }
