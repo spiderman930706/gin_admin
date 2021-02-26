@@ -2,6 +2,6 @@ package config
 
 type Config struct {
 	Mysql Mysql
-	JWT JWT
+	JWT   JWT
+	DEBUG bool
 }
-

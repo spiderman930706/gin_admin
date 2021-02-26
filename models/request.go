@@ -27,18 +27,38 @@ type DataInfo struct {
 }
 
 type BatchID struct {
-	IDList []int `json:"id_list"`
+	IDList []uint `json:"id_list"`
 }
 
+type Login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+//type RoleAuth struct {
+//	RoleIdStr string
+//	RoleId    int
+//	IDList    []int
+//}
+//
+//func (r *RoleAuth) verify() (err error) {
+//	if roleID, err := strconv.Atoi(r.RoleIdStr); err != nil {
+//		return errors.New("")
+//	} else {
+//		r.RoleId = roleID
+//	}
+//	return
+//}
+
 func (t *TableInfo) Verify() (err error) {
-	if err := tableVerify(t.Table); err != nil {
+	if err := TableVerify(t.Table); err != nil {
 		return err
 	}
 	return
 }
 
 func (p *PageInfo) Verify() (err error) {
-	if err := tableVerify(p.Table); err != nil {
+	if err := TableVerify(p.Table); err != nil {
 		return err
 	}
 	page, err := strconv.Atoi(p.PageStr)
@@ -65,7 +85,7 @@ func (p *PageInfo) Verify() (err error) {
 }
 
 func (d *DataInfo) Verify(checkId bool) (err error) {
-	if err := tableVerify(d.Table); err != nil {
+	if err := TableVerify(d.Table); err != nil {
 		return err
 	}
 	if checkId {
@@ -81,7 +101,7 @@ func (d *DataInfo) Verify(checkId bool) (err error) {
 	return nil
 }
 
-func tableVerify(table string) error {
+func TableVerify(table string) error {
 	if table == "" {
 		return errors.New("表名不能为空")
 	}
@@ -89,4 +109,11 @@ func tableVerify(table string) error {
 		return errors.New("表不存在")
 	}
 	return nil
+}
+
+func (l *Login) Verify() (err error) {
+	if l.Password == "" || l.Username == "" {
+		return errors.New("缺少请求参数")
+	}
+	return
 }

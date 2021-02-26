@@ -2,9 +2,6 @@ package gin_admin
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/spiderman930706/gin_admin/config"
 	"github.com/spiderman930706/gin_admin/core"
@@ -13,18 +10,24 @@ import (
 	"github.com/spiderman930706/gin_admin/models"
 	"github.com/spiderman930706/gin_admin/routers"
 	"gorm.io/gorm/schema"
+	"log"
+	"strings"
 )
 
 func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) error {
 	global.Config = config
-	db, err := core.MysqlInit(global.Config.Mysql)
+	db, err := core.MysqlInit(global.Config.Mysql, config.DEBUG)
 	if err != nil {
 		return err
 	}
 	global.DB = db
-	//Router.Use(middleware.JWTAuth())
 	Router.Use(middleware.Cors()).Use(middleware.Recovery())
-	routers.InitRouter(Router)
+	AuthGroup := Router.Group("")
+	AuthGroup.Use(middleware.JWTAuth()).Use(middleware.RoleAuth())
+	PubGroup := Router.Group("")
+	AdminGroup := Router.Group("")
+	AdminGroup.Use(middleware.JWTAuth()).Use(middleware.AdminAuth())
+	routers.InitRouter(AuthGroup, PubGroup, AdminGroup)
 	return nil
 }
 
@@ -46,6 +49,7 @@ func RegisterTables(migrate bool, dst ...models.AdminOperation) error {
 			return err
 		}
 	}
+	syncAuthTable()
 	return nil
 }
 
@@ -88,7 +92,7 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 		rr := strings.Split(n, ":")
 		switch rr[0] {
 		case "list":
-			m.List = true
+			m.ListShow = true
 		case "type":
 			m.Type = rr[1]
 		case "name":
@@ -99,4 +103,41 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 		fmt.Println("")
 	}
 	return
+}
+
+func syncAuthTable() {
+	for tableName, table := range global.Tables {
+		var auths []models.Auth
+		var method global.Method
+		global.DB.Where("table_name = ?", tableName).Find(&auths)
+		for _, auth := range auths {
+			authMethod := auth.Method
+			switch authMethod {
+			case "GET":
+				method.GET = true
+			case "POST":
+				method.POST = true
+			case "DELETE":
+				method.DELETE = true
+			case "PUT":
+				method.PUT = true
+			}
+		}
+		if !method.GET {
+			authGET := models.Auth{TableName: tableName, Method: "GET"}
+			global.DB.Create(&authGET)
+		}
+		if !method.PUT && table.CanModify {
+			authPUT := models.Auth{TableName: tableName, Method: "PUT"}
+			global.DB.Create(&authPUT)
+		}
+		if !method.POST && table.CanAdd {
+			authPOST := models.Auth{TableName: tableName, Method: "POST"}
+			global.DB.Create(&authPOST)
+		}
+		if !method.DELETE && table.CanDelete {
+			authDELETE := models.Auth{TableName: tableName, Method: "DELETE"}
+			global.DB.Create(&authDELETE)
+		}
+	}
 }

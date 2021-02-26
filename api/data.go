@@ -10,14 +10,27 @@ import (
 
 func GetAdminTableList(c *gin.Context) {
 	var result []string
-	for k := range global.Tables {
-		result = append(result, k)
+	if role, exists := c.Get("role"); !exists {
+		// 没有就是admin
+		for k := range global.Tables {
+			result = append(result, k)
+		}
+	} else {
+		if role, ok := role.(*models.Role); ok {
+			for _, k := range role.Auth {
+				if k.Method == "GET" {
+					result = append(result, k.TableName)
+				}
+			}
+		} else {
+			FailWithMessage("获取失败", c)
+		}
 	}
 	OkWithDetailed(result, "获取成功", c)
 }
 
 func GetAdminDataList(c *gin.Context) {
-	pageInfo := models.PageInfo{
+	pageInfo := &models.PageInfo{
 		Table:       c.Param("table"),
 		PageStr:     c.Query("page"),
 		PageSizeStr: c.Query("size"),
@@ -34,7 +47,7 @@ func GetAdminDataList(c *gin.Context) {
 }
 
 func GetAdminDataDetail(c *gin.Context) {
-	dataInfo := models.DataInfo{
+	dataInfo := &models.DataInfo{
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
 	}
@@ -50,7 +63,7 @@ func GetAdminDataDetail(c *gin.Context) {
 }
 
 func NewAdminData(c *gin.Context) {
-	dataInfo := models.DataInfo{
+	dataInfo := &models.DataInfo{
 		Table: c.Param("table"),
 	}
 	if err := dataInfo.Verify(false); err != nil {
@@ -67,7 +80,7 @@ func NewAdminData(c *gin.Context) {
 		return
 	}
 	dataInfo.Data = data
-	if err := util.CheckAndChangeData(&dataInfo, false); err != nil {
+	if err := util.CheckAndChangeData(dataInfo, false); err != nil {
 		FailWithMessage(err.Error(), c)
 		return
 	}
@@ -81,7 +94,7 @@ func NewAdminData(c *gin.Context) {
 }
 
 func ChangeAdminData(c *gin.Context) {
-	dataInfo := models.DataInfo{
+	dataInfo := &models.DataInfo{
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
 	}
@@ -99,7 +112,7 @@ func ChangeAdminData(c *gin.Context) {
 		return
 	}
 	dataInfo.Data = data
-	if err := util.CheckAndChangeData(&dataInfo, true); err != nil {
+	if err := util.CheckAndChangeData(dataInfo, true); err != nil {
 		FailWithMessage(err.Error(), c)
 		return
 	}
@@ -111,7 +124,7 @@ func ChangeAdminData(c *gin.Context) {
 }
 
 func DeleteAdminData(c *gin.Context) {
-	dataInfo := models.DataInfo{
+	dataInfo := &models.DataInfo{
 		Table:     c.Param("table"),
 		DataIdStr: c.Param("data_id"),
 	}
@@ -131,7 +144,7 @@ func DeleteAdminData(c *gin.Context) {
 }
 
 func BatchDeleteAdminData(c *gin.Context) {
-	dataInfo := models.DataInfo{
+	dataInfo := &models.DataInfo{
 		Table: c.Param("table"),
 	}
 	var idList models.BatchID
@@ -151,7 +164,7 @@ func BatchDeleteAdminData(c *gin.Context) {
 		FailWithMessage("禁止删除数据", c)
 		return
 	}
-	if err := service.BatchDeleteData(dataInfo, idList); err != nil {
+	if err := service.BatchDeleteData(dataInfo, &idList); err != nil {
 		FailWithMessage("删除失败", c)
 	} else {
 		OkWithMessage("删除成功", c)

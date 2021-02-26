@@ -26,7 +26,7 @@ func DataMap(table string) (dict map[string]*models.Dict) {
 		} else {
 			dataDict.Name = k
 		}
-		dataDict.List = v.List
+		dataDict.ListShow = v.ListShow
 		dataDict.Type = typeName
 		dict[k] = dataDict
 	}
@@ -43,9 +43,9 @@ func CheckAndChangeData(info *models.DataInfo, modify bool) (err error) {
 
 func UpdateTime(modify bool, data map[string]interface{}) {
 	if !modify {
-		data["created_on"] = time.Now()
+		data["created_at"] = time.Now()
 	}
-	data["modified_on"] = time.Now()
+	data["updated_at"] = time.Now()
 }
 
 func CheckFields(info *models.DataInfo) error {
@@ -58,10 +58,10 @@ func CheckFields(info *models.DataInfo) error {
 			dataType := table.Type
 			switch dataType {
 			case "password":
-				//todo 密码加密
-				fmt.Println("密码")
 				if value, ok := v.(string); ok {
-					fmt.Println(value)
+					info.Data[k] = MD5V([]byte(value))
+				} else {
+					return errors.New("密码居然不是字符串？")
 				}
 			case "time":
 				//todo 时间类型转换

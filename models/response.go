@@ -19,7 +19,17 @@ type DataResult struct {
 }
 
 type Dict struct {
-	Name string `json:"name"`
-	List bool   `json:"list"`
-	Type string `json:"type"`
+	Name     string `json:"name"`
+	ListShow bool   `json:"list_show"`
+	Type     string `json:"type"`
+}
+
+type LoginResult struct {
+	Token string `json:"token"`
+}
+
+type AuthList struct {
+	ID        string `json:"id"`
+	TableName string `json:"table_name"`
+	Method    string `json:"method"`
 }
