@@ -41,6 +41,13 @@ func RegisterTables(migrate bool, dst ...models.AdminOperation) error {
 		if err := core.MigrateMysqlTables(global.DB, res...); err != nil {
 			return err
 		}
+	} else {
+		var res []interface{}
+		res = append(res, &models.Role{})
+		res = append(res, &models.User{})
+		if err := core.MigrateMysqlTables(global.DB, res...); err != nil {
+			return err
+		}
 	}
 	dst = append(dst, &models.Role{})
 	global.Tables = make(map[string]*global.Table)
