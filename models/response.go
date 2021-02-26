@@ -27,3 +27,9 @@ type Dict struct {
 type LoginResult struct {
 	Token string `json:"token"`
 }
+
+type AuthList struct {
+	ID        string `json:"id"`
+	TableName string `json:"table_name"`
+	Method    string `json:"method"`
+}

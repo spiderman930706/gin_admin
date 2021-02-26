@@ -27,13 +27,28 @@ type DataInfo struct {
 }
 
 type BatchID struct {
-	IDList []int `json:"id_list"`
+	IDList []uint `json:"id_list"`
 }
 
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+//type RoleAuth struct {
+//	RoleIdStr string
+//	RoleId    int
+//	IDList    []int
+//}
+//
+//func (r *RoleAuth) verify() (err error) {
+//	if roleID, err := strconv.Atoi(r.RoleIdStr); err != nil {
+//		return errors.New("")
+//	} else {
+//		r.RoleId = roleID
+//	}
+//	return
+//}
 
 func (t *TableInfo) Verify() (err error) {
 	if err := TableVerify(t.Table); err != nil {

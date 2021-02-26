@@ -16,7 +16,7 @@ import (
 
 func RegisterConfigAndRouter(config config.Config, Router *gin.RouterGroup) error {
 	global.Config = config
-	db, err := core.MysqlInit(global.Config.Mysql)
+	db, err := core.MysqlInit(global.Config.Mysql, config.DEBUG)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func ParseTag(v *schema.Field) (m *global.Field) {
 }
 
 func syncAuthTable() {
-	for tableName := range global.Tables {
+	for tableName, table := range global.Tables {
 		var auths []models.Auth
 		var method global.Method
 		global.DB.Where("table_name = ?", tableName).Find(&auths)
@@ -127,15 +127,15 @@ func syncAuthTable() {
 			authGET := models.Auth{TableName: tableName, Method: "GET"}
 			global.DB.Create(&authGET)
 		}
-		if !method.PUT {
+		if !method.PUT && table.CanModify {
 			authPUT := models.Auth{TableName: tableName, Method: "PUT"}
 			global.DB.Create(&authPUT)
 		}
-		if !method.POST {
+		if !method.POST && table.CanAdd {
 			authPOST := models.Auth{TableName: tableName, Method: "POST"}
 			global.DB.Create(&authPOST)
 		}
-		if !method.DELETE {
+		if !method.DELETE && table.CanDelete {
 			authDELETE := models.Auth{TableName: tableName, Method: "DELETE"}
 			global.DB.Create(&authDELETE)
 		}

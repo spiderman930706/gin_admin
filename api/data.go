@@ -10,8 +10,21 @@ import (
 
 func GetAdminTableList(c *gin.Context) {
 	var result []string
-	for k := range global.Tables {
-		result = append(result, k)
+	if role, exists := c.Get("role"); !exists {
+		// 没有就是admin
+		for k := range global.Tables {
+			result = append(result, k)
+		}
+	} else {
+		if role, ok := role.(*models.Role); ok {
+			for _, k := range role.Auth {
+				if k.Method == "GET" {
+					result = append(result, k.TableName)
+				}
+			}
+		} else {
+			FailWithMessage("获取失败", c)
+		}
 	}
 	OkWithDetailed(result, "获取成功", c)
 }
@@ -135,7 +148,7 @@ func BatchDeleteAdminData(c *gin.Context) {
 		Table: c.Param("table"),
 	}
 	var idList models.BatchID
-	if err := c.ShouldBindJSON(idList); err != nil {
+	if err := c.ShouldBindJSON(&idList); err != nil {
 		FailWithMessage("请求参数有误", c)
 		return
 	}

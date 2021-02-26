@@ -9,5 +9,7 @@ func InitSuperUserRouter(Router *gin.RouterGroup) {
 	apiRouter := Router.Group("super")
 	{
 		apiRouter.GET("/role/:role_id", api.RoleAuthList)
+		apiRouter.PUT("/role/:role_id", api.ChangeRoleAuth)
+		apiRouter.GET("/auth", api.AuthList)
 	}
 }

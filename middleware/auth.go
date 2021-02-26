@@ -69,15 +69,17 @@ func accessControl(claims *models.CustomClaims, c *gin.Context) (ok bool) {
 	}
 	method := c.Request.Method
 	table := c.Param("table")
-	if err := models.TableVerify(table); err != nil {
-		return
-	}
 	var role models.Role
 	global.DB.Where("id = ?", roleID).Preload("Auth").First(&role)
-	for _, auth := range role.Auth {
-		if auth.Method == method && auth.TableName == table {
-			return true
+	c.Set("role", &role)
+	if table != "" {
+		for _, auth := range role.Auth {
+			if auth.Method == method && auth.TableName == table {
+				return true
+			}
 		}
+	} else {
+		return true
 	}
 	return
 }

@@ -1,14 +1,17 @@
 package core
 
 import (
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"log"
+	"os"
+	"time"
 
 	"github.com/spiderman930706/gin_admin/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func MysqlInit(m config.Mysql) (db *gorm.DB, err error) {
+func MysqlInit(m config.Mysql, debug bool) (db *gorm.DB, err error) {
 	dbName := m.DbName
 	user := m.User
 	password := m.Password
@@ -22,7 +25,21 @@ func MysqlInit(m config.Mysql) (db *gorm.DB, err error) {
 		DontSupportRenameColumn:   true,  // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
 		SkipInitializeWithVersion: false, // 根据版本自动配置
 	}
-	if db, err = gorm.Open(mysql.New(mysqlConfig), &gorm.Config{}); err != nil {
+	gc := &gorm.Config{}
+	if debug {
+		newLogger := logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold: time.Second, // 慢 SQL 阈值
+				LogLevel:      logger.Info, // Log level
+				Colorful:      false,       // 禁用彩色打印
+			},
+		)
+		gc = &gorm.Config{
+			Logger: newLogger,
+		}
+	}
+	if db, err = gorm.Open(mysql.New(mysqlConfig), gc); err != nil {
 		log.Printf("MySQL启动异常 %s", err)
 		return nil, err
 	} else {
